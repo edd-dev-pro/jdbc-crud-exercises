@@ -1,24 +1,16 @@
 package edd.dev.main;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Main {
-    static void main(String[] args) {
-        Connection myConnection = null;
-        Statement myStatement = null;
-        ResultSet myResultSet = null;
+    static void main(String[] args) throws SQLException {
+        final String URL = "";
+        final String USER = "";
+        final String PASSWORD = "";
 
-        try{
-            myConnection = DriverManager.getConnection(
-                    "",
-                    "",
-                    ""
-            );
-            myStatement = myConnection.createStatement();
-            myResultSet = myStatement.executeQuery("SELECT * FROM employees");
+        try (Connection myConnection = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement myStatement = myConnection.createStatement();
+             ResultSet myResultSet = myStatement.executeQuery("SELECT * FROM employees");) { // try with resources, better than finally
 
             while (myResultSet.next()) {
                 System.out.println(myResultSet.getString("first_name"));
@@ -27,5 +19,16 @@ public class Main {
             e.printStackTrace();
             System.out.println("No se pudo establecer la conexión...");
         }
+        /* finally {
+            if (myResultSet != null) {
+                myResultSet.close();
+            }
+            if (myStatement != null) {
+                myResultSet.close();
+            }
+            if (myConnection != null) {
+                myResultSet.close();
+            }
+        }*/
     }
 }
