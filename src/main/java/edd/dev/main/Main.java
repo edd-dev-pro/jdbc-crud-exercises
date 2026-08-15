@@ -17,15 +17,22 @@ public class Main {
             repository.findAll().forEach(System.out::println);
             // System.out.println(repository.getById(2));
 
-            System.out.println("\nAdding an employee...");
+            System.out.println("\nAdding or updating an employee...");
 
             Employee employee = new Employee();
+            employee.setId(7);
             employee.setFirst_name("Josh");
             employee.setPa_surname("Parker");
             employee.setMa_surname("Nicols");
             employee.setEmail("josh.parker@example.com");
             employee.setSalary((double)30000);
             repository.save(employee);
+
+            System.out.println("\n---------- Show list of employees updated ----------");
+            repository.findAll().forEach(System.out::println);
+
+            System.out.println("\nRemove employee...");
+            repository.delete(7);
 
             System.out.println("\n---------- Show list of employees updated ----------");
             repository.findAll().forEach(System.out::println);
