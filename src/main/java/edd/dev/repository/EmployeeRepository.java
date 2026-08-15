@@ -46,7 +46,13 @@ public class EmployeeRepository implements Repository<Employee> {
 
     @Override
     public void save(Employee employee) throws SQLException {
-        String sqlQuery = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary) VALUES (?,?,?,?,?)";
+        String sqlQuery;
+
+        if (employee.getId() != null && employee.getId() > 0) {
+            sqlQuery = "UPDATE employees SET first_name=?, pa_surname=?, ma_surname=?, email=?, salary=? WHERE id=?";
+        } else {
+            sqlQuery = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary) VALUES (?,?,?,?,?)";
+        }
 
         try (PreparedStatement myStatement = getConnection().prepareStatement(sqlQuery)) {
             myStatement.setString(1, employee.getFirst_name());
@@ -54,13 +60,21 @@ public class EmployeeRepository implements Repository<Employee> {
             myStatement.setString(3, employee.getMa_surname());
             myStatement.setString(4, employee.getEmail());
             myStatement.setDouble(5, employee.getSalary());
+            if (employee.getId() != null && employee.getId() > 0) {
+                myStatement.setInt(6, employee.getId());
+            }
             myStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void delete(Integer id) {
-
+    public void delete(Integer id) throws SQLException {
+        try(PreparedStatement myStatement = getConnection().prepareStatement("DELETE FROM employees WHERE id=?")) {
+            myStatement.setInt(1, id);
+            myStatement.executeUpdate();
+        }
     }
 
     private Employee createEmployee(ResultSet myResultSet) throws SQLException {
