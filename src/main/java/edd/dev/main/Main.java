@@ -9,33 +9,38 @@ import java.sql.*;
 
 public class Main {
     static void main(String[] args) throws SQLException {
+        try (Connection myConnection = DataBaseConnection.getInstance()) {
+            if (myConnection.getAutoCommit()) {
+                myConnection.setAutoCommit((false));
+            }
 
-        try (Connection myConnection = DataBaseConnection.getInstance();) { // try-with-resources, better than finally
-            Repository<Employee> repository = new EmployeeRepository();
+            try {
+               Repository<Employee> repository = new EmployeeRepository(myConnection);
+               System.out.println("----- Add new employee -----");
 
-            System.out.println("---------- Show list of employees ----------");
-            repository.findAll().forEach(System.out::println);
-            // System.out.println(repository.getById(2));
+               Employee employee = new Employee();
+               /* employee.setFirst_name("America");
+               employee.setPa_surname("Alpes");
+               employee.setMa_surname("Villa");
+               employee.setEmail("america.alp@example.com");
+               employee.setSalary((double)30000);
+               employee.setCurp("ALVA940312LK8KII76");*/
 
-            System.out.println("\nAdding or updating an employee...");
+                employee.setFirst_name("Kenia");
+                employee.setPa_surname("Alpes");
+                employee.setMa_surname("Villa");
+                employee.setEmail("america.alp@example.com");
+                employee.setSalary((double)50000);
+                employee.setCurp("ALVA940312LK8KII76"); // Since we are using a duplicate curp value, the employee cannot be saved
 
-            Employee employee = new Employee();
-            employee.setId(7);
-            employee.setFirst_name("Josh");
-            employee.setPa_surname("Parker");
-            employee.setMa_surname("Nicols");
-            employee.setEmail("josh.parker@example.com");
-            employee.setSalary((double)30000);
-            repository.save(employee);
+               repository.save(employee);
 
-            System.out.println("\n---------- Show list of employees updated ----------");
-            repository.findAll().forEach(System.out::println);
+               myConnection.commit();
+            } catch (SQLException e) {
+                myConnection.rollback();
 
-            System.out.println("\nRemove employee...");
-            repository.delete(7);
-
-            System.out.println("\n---------- Show list of employees updated ----------");
-            repository.findAll().forEach(System.out::println);
+                throw new RuntimeException(e);
+            }
         }
     }
 }
